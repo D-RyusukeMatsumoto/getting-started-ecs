@@ -323,7 +323,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d29733c867fb65a4c96f26718234f736, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useJobs: 1
+  useJobs: 0
   IeinuPrefab: {fileID: 5450071931269891857, guid: eb183809e546f05498841fa9188fbdbc,
     type: 3}
 --- !u!4 &1873991212

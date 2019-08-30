@@ -69,6 +69,8 @@ namespace Chapter2
                     positionArray = positionArray,
                     moveYArray = moveYArray,
                 };
+                JobHandle jobHandle = reallyToughParallelJob.Schedule(ieinuList.Count, 100);
+                jobHandle.Complete();
 */
 
                 ReallyToughParallelJobTransforms reallyToughParallelJobTransforms = new ReallyToughParallelJobTransforms
@@ -104,13 +106,14 @@ namespace Chapter2
                     {
                         ieinu.moveY = +math.abs(ieinu.moveY);
                     }
+
+                    float value = 0f;
+                    for (var i = 0; i < 1000; ++i)
+                    {
+                        value = math.exp10(math.sqrt(value));
+                    }
                 }
             
-                float value = 0f;
-                for (var i = 0; i < 1000; ++i)
-                {
-                    value = math.exp10(math.sqrt(value));
-                }
             }
 /*
             if (useJobs)
@@ -132,7 +135,7 @@ namespace Chapter2
                 }
             }
 */
-            Debug.Log(((Time.realtimeSinceStartup - startTime) * 1000f) + "ms");
+            //Debug.Log(((Time.realtimeSinceStartup - startTime) * 1000f) + "ms");
         }
 
 
@@ -159,9 +162,6 @@ namespace Chapter2
     [BurstCompile]
     public struct ReallyToughJob : IJob
     {
-        public float something;
-        
-        
         public void Execute()
         {
             float value = 0f;
@@ -185,7 +185,6 @@ namespace Chapter2
         public void Execute(
             int index)
         {
-                        
             positionArray[index] += new float3(0, moveYArray[index] * deltaTime, 0f);
             if (5f < positionArray[index].y)
             {
@@ -201,7 +200,6 @@ namespace Chapter2
             {
                 value = math.exp10(math.sqrt(value));
             }
-
         }
     }
 
@@ -217,7 +215,6 @@ namespace Chapter2
             int index,
             TransformAccess transform)
         {
-            
             transform.position += new Vector3(0, moveYArray[index] * deltaTime, 0f);
             if (5f < transform.position.y)
             {
@@ -233,7 +230,6 @@ namespace Chapter2
             {
                 value = math.exp10(math.sqrt(value));
             }
-
         }
         
         
