@@ -10,5 +10,8 @@ https://www.youtube.com/watch?v=ILfUuBLfzGI&list=PLzDRvYVwl53s40yP5RQXitbT--IRcH
 **Chapter 2**
 https://www.youtube.com/watch?v=C56bbgtPr_w&list=PLzDRvYVwl53s40yP5RQXitbT--IRcHqba&index=2
 
+**Chapter 3**
+https://www.youtube.com/watch?v=fTw_fXsvC6I&list=PLzDRvYVwl53s40yP5RQXitbT--IRcHqba&index=3
+
 
 
