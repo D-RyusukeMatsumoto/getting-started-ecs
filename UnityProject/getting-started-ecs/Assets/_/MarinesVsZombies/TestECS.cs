@@ -49,36 +49,50 @@ public class TestECS : MonoBehaviour {
     public static NativeQueue<MarineShotZombieAction> queuedActions;
 
 
-    private void Awake() {
+    private void Awake() 
+    {
         //Sound_Manager.Init((Sound_Manager.AudioType audioType) => .015f);
         instance = this;
         queuedActions = new NativeQueue<MarineShotZombieAction>(Allocator.Persistent);
     }
 
-    private void Start() {
+    private void Start() 
+    {
         cameraFollowZoom = 80f;
         cameraFollow.Setup(() => cameraFollowPosition, () => cameraFollowZoom, true, true);
         entityManager = World.Active.EntityManager;
 
+        // 各システムの初期化.
         ECS_Animation.Init();
         ECS_QuadrantSystem.Init();
 
         shadowMesh = ECS_Animation.CreateMesh(9f, 6f);
 
-        for (int i = 0; i < 30; i++) {
+        // 海兵隊の生成.
+        for (int i = 0; i < 30; i++) 
+        {
             SpawnMarine();
         }
 
-        for (int i = 0; i < 1; i++) {
+        // ゾンビの生成.
+        for (int i = 0; i < 1; i++) 
+        {
             SpawnZombie(true);
         }
     }
 
-    private void SpawnMarine() {
+    
+    // 海兵隊の生成.
+    private void SpawnMarine() 
+    {
         SpawnMarine(new float3(UnityEngine.Random.Range(-70f, 70f), UnityEngine.Random.Range(-60f, 60f), 0f));
     }
 
-    private void SpawnMarine(float3 spawnPosition) {
+    
+    // 海兵隊の生成処理.
+    private void SpawnMarine(float3 spawnPosition) 
+    {
+        // 海兵隊のアーキタイプを作成.
         EntityArchetype entityArchetype = entityManager.CreateArchetype(
             typeof(Marine),
             typeof(Skeleton_Data),
@@ -93,8 +107,10 @@ public class TestECS : MonoBehaviour {
             typeof(Translation)
         );
 
+        // エンティティの作成.
         Entity entity = entityManager.CreateEntity(entityArchetype);
 
+        // 各種コンポーネントデータのセット.
         entityManager.SetComponentData(entity, new Translation { Value = spawnPosition });
         entityManager.SetComponentData(entity, new Skeleton_Data { frameRate = 1f });
         entityManager.SetComponentData(entity, new Skeleton_Material { materialTypeEnum = Skeleton_Material.TypeEnum.Marine });
@@ -105,11 +121,17 @@ public class TestECS : MonoBehaviour {
         entityManager.SetComponentData(entity, new EntityAnims { idleAnimType = ECS_UnitAnimType.TypeEnum.dMarine_Idle, walkAnimType = ECS_UnitAnimType.TypeEnum.dMarine_Walk });
         entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Marine });
         entityManager.SetComponentData(entity, new FindTargetData { targetRange = 100f });
-            
+
+        // TODO : アニメーションの再生? 後でコードを見に行く.
         ECS_Animation.PlayAnimForced(entity, ECS_UnitAnimType.TypeEnum.dBareHands_Idle, new Vector3(0, -1), default);
     }
 
-    private void SpawnZombie(bool spawnZombieTop) {
+
+    // ゾンビのスポーン処理.
+    private void SpawnZombie(
+        bool spawnZombieTop) 
+    {
+        // ゾンビのアーキタイプを作成.
         EntityArchetype zombieArchetype = entityManager.CreateArchetype(
             typeof(Zombie),
             typeof(Skeleton_Data),
@@ -124,15 +146,20 @@ public class TestECS : MonoBehaviour {
             typeof(Translation)
         );
 
+        // ゾンビエンティティの作成.
         Entity entity = entityManager.CreateEntity(zombieArchetype);
 
         float3 spawnPosition;
-        if (spawnZombieTop) {
+        if (spawnZombieTop) 
+        {
             spawnPosition = new float3(UnityEngine.Random.Range(-100f, 100f), 400f, 0f);
-        } else {
+        }
+        else 
+        {
             spawnPosition = UtilsClass.GetRandomDir() * 400f;
         }
 
+        // 各種コンポーネントデータのセット.
         entityManager.SetComponentData(entity, new Translation { Value = spawnPosition });
         entityManager.SetComponentData(entity, new Skeleton_Data { frameRate = 1f });
         entityManager.SetComponentData(entity, new Skeleton_Material { materialTypeEnum = Skeleton_Material.TypeEnum.Zombie });
@@ -154,20 +181,26 @@ public class TestECS : MonoBehaviour {
 
         entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Zombie });
         entityManager.SetComponentData(entity, new FindTargetData { targetRange = 100f });
-            
+
+        // TODO : アニメーションの再生? 後でコードを見る.
         ECS_Animation.PlayAnimForced(entity, ECS_UnitAnimType.TypeEnum.dBareHands_Idle, new Vector3(0, -1), default);
     }
 
-    private void Update() {
+    private void Update() 
+    {
         HandleCamera();
         HandleZombieSpawning();
 
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetMouseButtonDown(0)) 
+        {
             SpawnMarine(UtilsClass.GetMouseWorldPosition());
         }
     }
 
-    private void HandleCamera() {
+
+    // プレイヤーの入力とカメラの制御.
+    private void HandleCamera() 
+    {
         Vector3 moveDir = Vector3.zero;
         if (Input.GetKey(KeyCode.W)) { moveDir.y = +1f; }
         if (Input.GetKey(KeyCode.S)) { moveDir.y = -1f; }
@@ -185,24 +218,33 @@ public class TestECS : MonoBehaviour {
         cameraFollowZoom = Mathf.Clamp(cameraFollowZoom, 20f, 200f);
     }
 
+    
+    // ゾンビの初期スポーン以外のスポーン処理( 継続して生成されるやつ ).
     private float zombieSpawnTimer;
     private float zombieSpawnTimerMax = .2f;
-    private void HandleZombieSpawning() {
+    private void HandleZombieSpawning() 
+    {
         zombieSpawnTimer -= Time.deltaTime;
-        if (zombieSpawnTimer < 0) {
+        if (zombieSpawnTimer < 0) 
+        {
             zombieSpawnTimer = zombieSpawnTimerMax;
             zombieSpawnTimerMax = .2f - Time.time * .002f;
             zombieSpawnTimerMax = Mathf.Clamp(zombieSpawnTimerMax, .07f, 1f);
 
             int spawnZombieCount = Mathf.RoundToInt(1 + Time.time * .05f);
 
-            if (Time.time < 20f) {
-                for (int i = 0; i < spawnZombieCount; i++) {
+            if (Time.time < 20f) 
+            {
+                for (int i = 0; i < spawnZombieCount; i++) 
+                {
                     SpawnZombie(true);
                 }
-            } else {
+            } 
+            else
+            {
                 SpawnZombie(true);
-                for (int i = 0; i < spawnZombieCount; i++) {
+                for (int i = 0; i < spawnZombieCount; i++) 
+                {
                     SpawnZombie(false);
                 }
             }
